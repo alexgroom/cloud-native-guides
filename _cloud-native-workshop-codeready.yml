@@ -35,6 +35,7 @@ modules:
   - catalog-spring-boot-codeready
   - gateway-vertx-codeready
   - webui-deployment
+  - debug-codeready
   - app-config-thorntail
   - health
   - fault-tolerance-codeready
