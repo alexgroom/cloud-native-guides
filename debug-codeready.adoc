@@ -1,6 +1,6 @@
 ## Debugging Applications
 
-*20 MINUTE EXERCISE*
+*15 MINUTE EXERCISE*
 
 In this lab you will debug the CoolStore application using Java remote debugging and 
 look into line-by-line code execution as the code runs inside a container on OpenShift.
@@ -12,10 +12,8 @@ products not to be displayed in the web interface.
 
 image:{% image_path debug-coolstore-bug.png %}[Inventory Status Bug,800]
 
-This is not an expected behavior! In previous labs, you added a circuit breaker to 
-protect the CoolStore application from failures and in case the Inventory API is not 
-available, to skip it and show the products without the inventory status. However, right 
-now the inventory status is available for all products but one which is not how we 
+This is not an expected behavior! Right 
+now the inventory status is available for all products but one, which is not how we 
 expect to see the products.
 
 Since the product list is provided by the API Gateway, take a look into the API Gateway 
@@ -77,13 +75,11 @@ Inventory pod to your workstation so simplify connectivity.
 Enable remote debugging on Inventory by running the following command in the CodeReady Workspaces **Terminal** window:
 
 ----
-$ oc rollout pause dc/inventory
-$ oc set env dc/inventory JAVA_DEBUG=true
-$ oc set env dc/inventory AB_PROMETHEUS_OFF-
-$ oc set probe dc/inventory --readiness --liveness --remove
-$ oc rollout resume dc/inventory
-$ oc rollout latest dc/inventory
-$ oc get pods -lapp=inventory,deploymentconfig=inventory
+oc rollout pause dc/inventory
+oc set env dc/inventory JAVA_DEBUG=true
+oc rollout resume dc/inventory
+oc rollout latest dc/inventory
+oc get pods -lapp=inventory,deploymentconfig=inventory
 NAME                 READY     STATUS    RESTARTS   AGE
 inventory-19-k54lj   1/1       Running   0          3m
 ----
@@ -212,24 +208,8 @@ public Inventory getAvailability(@PathParam("itemId") String itemId) {
 ----
 
 Go back to the **Terminal** window where `*oc port-forward*` was running. Press 
-`Ctrl+C*` to stop the debug and port-forward and then run the following commands 
-to commit the changes to the Git repository.
+`Ctrl+C*` to stop the debug and port-forward.
 
-----
-$ git add src/main/java/com/redhat/cloudnative/inventory/InventoryResource.java
-$ git commit -m "inventory returns zero for non-existing product id" 
-$ git push origin master
-----
-
-As soon as you commit the changes to the Git repository, the ***inventory-pipeline*** gets 
-triggered to build and deploy a new Inventory container with the fix. Go to the 
-OpenShift Web Console and inside the **{{COOLSTORE_PROJECT}}** project. On the sidebar 
-menu, `*click on 'Builds >> Pipelines'*` to see its progress.
-
-When the pipeline completes successfully, point your browser at the Web route and verify 
-that the inventory status is visible for all products. The suspect product should show 
-the inventory status as _Not in Stock_.
-
-image:{% image_path debug-coolstore-bug-fixed.png %}[Inventory Status Bug Fixed,800]
-
-Well done and congratulations for completing all the labs.
+To build and deploy the **Inventory Service** on OpenShift using the *fabric8* maven plugin, 
++which is already configured in CodeReady Workspaces, `*right click on 'inventory-thorntail'*` project in the project explorer 
++then, `*click on 'Commands > Deploy > fabric8:deploy'*`:
